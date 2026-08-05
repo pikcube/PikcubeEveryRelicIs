@@ -1,0 +1,20 @@
+{
+  "id": "PikcubeEveryRelicIs",
+  "name": "Pikcube Every Relic Is",
+  "author": "Pikcube",
+  "description": "Mod that changes which relic spawns when, while not touching the dev console so errors can be fixed.",
+  "version": "v0.0.0",
+  "has_pck": true,
+  "has_dll": true,
+  "dependencies": [
+    {
+      "id": "BaseLib",
+      "min_version": "v3.4.0"
+    },
+    {
+      "id": "Pikcube.Common",
+      "min_version": "v0.3.5"
+    }
+  ],
+  "affects_gameplay": true
+}
