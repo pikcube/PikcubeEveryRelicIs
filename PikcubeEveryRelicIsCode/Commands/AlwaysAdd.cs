@@ -35,9 +35,9 @@ public class AlwaysAdd : AbstractConsoleCmd
             return new CmdResult(false, string.Join('\n', errors));
         }
 
-        MainFile.RelicQueue.AddRange(relics);
-        MainFile.ResetPos();
-        return new CmdResult(true, $"Current queue: {string.Join('|', MainFile.RelicQueue.Select(r => r.Id.ToString()))}");
+        AlwaysRelicManager.RelicQueue.AddRange(relics);
+        AlwaysRelicManager.ResetPos();
+        return new CmdResult(true, $"Current queue: {string.Join('|', AlwaysRelicManager.RelicQueue.Select(r => r.Id.ToString()))}");
 
     }
 

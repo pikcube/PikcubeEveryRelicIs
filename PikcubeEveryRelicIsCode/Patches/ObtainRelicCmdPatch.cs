@@ -11,7 +11,7 @@ public static class ObtainRelicCmdPatch
     private static int IgnoreCount { get; set; }
     public static void Prefix(ref RelicModel relic, Player player, int index = -1)
     {
-        if (!MainFile.IsRelicQueueEnabled)
+        if (!AlwaysRelicManager.IsRelicQueueEnabled)
         {
             IgnoreCount = 0;
             return;
@@ -24,12 +24,12 @@ public static class ObtainRelicCmdPatch
         }
 
         RelicModel model = relic;
-        if (MainFile.RelicQueue.Any(r => r.CanonicalInstance == model.CanonicalInstance))
+        if (AlwaysRelicManager.RelicQueue.Any(r => r.CanonicalInstance == model.CanonicalInstance))
         {
             return;
         }
 
-        relic = MainFile.NextRelic().ToMutable();
+        relic = AlwaysRelicManager.NextRelic().ToMutable();
     }
 
     public static void AllowNext()

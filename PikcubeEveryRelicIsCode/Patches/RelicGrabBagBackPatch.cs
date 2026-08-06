@@ -12,11 +12,11 @@ public static class RelicGrabBagBackPatch
         Func<RelicModel, bool> filter,
         IRunState runState)
     {
-        if (!MainFile.IsRelicQueueEnabled)
+        if (!AlwaysRelicManager.IsRelicQueueEnabled)
         {
             return __result;
         }
-        return MainFile.NextRelic();
+        return AlwaysRelicManager.NextRelic();
     }
 }
 
@@ -27,10 +27,10 @@ public static class RelicGrabBagFrontPatch
         Func<RelicModel, bool> filter,
         IRunState runState)
     {
-        if (!MainFile.IsRelicQueueEnabled)
+        if (!AlwaysRelicManager.IsRelicQueueEnabled)
         {
             return __result;
         }
-        return MainFile.NextRelic();
+        return AlwaysRelicManager.NextRelic();
     }
 }

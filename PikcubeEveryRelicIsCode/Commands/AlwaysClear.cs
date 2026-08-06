@@ -8,8 +8,8 @@ public class AlwaysClear : AbstractConsoleCmd
 {
     public override CmdResult Process(Player? issuingPlayer, string[] args)
     {
-        MainFile.RelicQueue.Clear();
-        MainFile.ResetPos();
+        AlwaysRelicManager.RelicQueue.Clear();
+        AlwaysRelicManager.ResetPos();
         return new CmdResult(true, "Queue empty");
     }
 

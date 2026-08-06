@@ -2,8 +2,6 @@
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Relics;
-using PikcubeEveryRelicIs.PikcubeEveryRelicIsCode.Relics;
 
 namespace PikcubeEveryRelicIs.PikcubeEveryRelicIsCode.Patches;
 
@@ -43,18 +41,11 @@ public static class StartingRelicPatch
 
     public static IReadOnlyList<RelicModel> Postfix(IReadOnlyList<RelicModel> __result)
     {
-        if (!MainFile.IsRelicQueueEnabled)
+        if (!AlwaysRelicManager.IsRelicQueueEnabled || !ModifyStartingRelicPatch.IsOverrideOn)
         {
             return __result;
         }
-        return ModifyStartingRelicPatch.IsOverrideOn ? [.. __result.Select(_ =>
-        {
-            RelicModel relic = MainFile.NextRelic();
-            if (relic is CallingBell)
-            {
-                relic = ModelDb.Relic<DerpingBell>();
-            }
-            return relic;
-        })] : __result;
+
+        return [];
     }
 }

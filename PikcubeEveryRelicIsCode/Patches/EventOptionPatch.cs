@@ -9,11 +9,11 @@ public class EventOptionPatch
 {
     public static void Prefix(ref RelicModel relic, EventModel eventModel, ref Func<Task>? onChosen, string textKey)
     {
-        if (!MainFile.IsRelicQueueEnabled)
+        if (!AlwaysRelicManager.IsRelicQueueEnabled)
         {
             return;
         }
 
-        relic = MainFile.NextRelic(false).ToMutable();
+        relic = AlwaysRelicManager.NextRelic(false).ToMutable();
     }
 }
