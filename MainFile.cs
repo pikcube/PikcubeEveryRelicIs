@@ -1,5 +1,4 @@
 using BaseLib.Abstracts;
-using BaseLib.Utils;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -7,8 +6,9 @@ using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Relics;
 using MegaCrit.Sts2.Core.Runs;
-using Pikcube.Common.Extensions;
+using MegaCrit.Sts2.Core.Saves;
 using Pikcube.Common.Utility;
+using PikcubeEveryRelicIs.PikcubeEveryRelicIsCode.Commands;
 
 namespace PikcubeEveryRelicIs;
 
@@ -24,22 +24,23 @@ public partial class MainFile : Node
     {
         Harmony harmony = new(ModId);
         harmony.PatchAll();
+
+        BetterHooks.AfterOneTimeInitialization += BetterHooks_AfterOneTimeInitialization;
+    }
+
+    private static void BetterHooks_AfterOneTimeInitialization()
+    {
+        AlwaysRelicManager.LoadOrDefault();
     }
 }
 
-public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), IRunInitializedListener
+public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), ICreatingNewRunListener
 {
-    public static SpireField<Player, int> SavedPosition = new(() => 0);
-
     private static int Position
     {
         get;
-        set
-        {
-            field = value % Math.Max(RelicQueue.Count, 1);
-            RunState? state = RunManager.Instance.PrivatePropertyWrapper<RunManager, RunState>("State").Value;
-        }
-    } = 0;
+        set => field = value % Math.Max(RelicQueue.Count, 1);
+    } = -1;
 
     public static List<RelicModel> RelicQueue { get; set; } = [];
     public static bool IsRelicQueueEnabled => RelicQueue.Count > 0;
@@ -51,10 +52,13 @@ public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), IRunInit
         }
 
         RelicModel relic = RelicQueue[Position];
-        if (moveNext)
+        if (!moveNext)
         {
-            ++Position;
+            return relic;
         }
+
+        ++Position;
+        Save();
 
         return relic;
     }
@@ -62,10 +66,52 @@ public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), IRunInit
     public static void ResetPos()
     {
         Position = 0;
+        Save();
     }
 
-    public void AfterRunInitialized(RunState runState)
+    private static void Save()
     {
-        
+        GodotFileIo godotFile = new(UserDataPathProvider.GetAccountScopedBasePath("pikcube/everyrelic"));
+        godotFile.WriteFile("everyRelicState.txt", $"{Position}\n{string.Join('\n', RelicQueue.Select(r => r.Id.ToString()))}");
+    }
+    public static void LoadOrDefault()
+    {
+        GodotFileIo godotFile = new(UserDataPathProvider.GetAccountScopedBasePath("pikcube/everyrelic"));
+        string body = godotFile.ReadFile("everyRelicState.txt") ?? string.Empty;
+        if (string.IsNullOrEmpty(body))
+        {
+            return;
+        }
+
+        string[] lines = body.Split('\n');
+        try
+        {
+            foreach (string line in lines)
+            {
+                if (int.TryParse(line, out int pos))
+                {
+                    Position = pos;
+                    continue;
+                }
+
+                RelicModel? relic = AlwaysAdd.GetRelicById(line);
+                if (relic is null)
+                {
+                    continue;
+                }
+                RelicQueue.Add(relic);
+            }
+        }
+        catch (Exception e)
+        {
+            MainFile.Logger.Error(e.Message);
+        }
+        Save();
+    }
+
+    public void AfterCreatingNewRun(RunState runState, IReadOnlyList<Player> players, IReadOnlyList<ActModel> acts, IReadOnlyList<ModifierModel> modifiers,
+        GameMode gameMode, int ascensionLevel, string seed)
+    {
+        ResetPos();
     }
 }

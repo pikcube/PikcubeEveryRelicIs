@@ -16,7 +16,7 @@ public static class RelicGrabBagBackPatch
         {
             return __result;
         }
-        return AlwaysRelicManager.NextRelic();
+        return AlwaysRelicManager.NextRelic(false);
     }
 }
 

@@ -41,7 +41,7 @@ public class AlwaysAdd : AbstractConsoleCmd
 
     }
 
-    private static RelicModel? GetRelicById(string id)
+    public static RelicModel? GetRelicById(string id)
     {
         id = id.ToUpperInvariant();
         List<RelicModel> list = [.. ModelDb.AllRelics.Where(r => r.Id.Entry.Contains(id))];
