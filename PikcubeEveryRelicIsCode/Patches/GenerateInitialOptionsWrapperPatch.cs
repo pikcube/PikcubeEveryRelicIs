@@ -25,20 +25,19 @@ public class GenerateInitialOptionsWrapperPatch
         for (int n = 0; n < count; ++n)
         {
             RelicModel relicModel = AlwaysRelicManager.NextRelic().ToMutable();
-            ObtainWithoutSoftlocking(relicModel, __instance.Owner);
+            ObtainRelicWithoutSoftlocking(relicModel, __instance.Owner);
         }
     }
 
-    public static void ObtainWithoutSoftlocking(RelicModel relic, Player player, int index = -1)
+    public static void ObtainRelicWithoutSoftlocking(RelicModel relic, Player player, int index = -1)
     {
         relic.AssertMutable();
-        IRunState runState = player.RunState;
-        runState.CurrentMapPointHistoryEntry?.GetEntry(player.NetId).RelicChoices.Add(new ModelChoiceHistoryEntry(relic.Id, true));
+        player.RunState.CurrentMapPointHistoryEntry?.GetEntry(player.NetId).RelicChoices.Add(new ModelChoiceHistoryEntry(relic.Id, true));
         player.AddRelicInternal(relic, index);
         if (!relic.IsStackable)
         {
             player.RelicGrabBag.Remove(relic);
-            runState.SharedRelicGrabBag.Remove(relic);
+            player.RunState.SharedRelicGrabBag.Remove(relic);
         }
         if (LocalContext.IsMe(player))
         {
@@ -46,7 +45,7 @@ public class GenerateInitialOptionsWrapperPatch
             NDebugAudioManager.Instance?.Play("relic_get.mp3");
             SaveManager.Instance.MarkRelicAsSeen(relic);
         }
-        relic.FloorAddedToDeck = runState.TotalFloor;
+        relic.FloorAddedToDeck = player.RunState.TotalFloor;
         TaskHelper.RunSafely(relic.AfterObtained());
     }
 }
