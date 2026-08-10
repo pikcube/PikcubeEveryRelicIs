@@ -3,7 +3,7 @@
   "name": "Pikcube Every Relic Is",
   "author": "Pikcube",
   "description": "Mod that changes which relic spawns when, while not touching the dev console so errors can be fixed.\nUse `always_add` to choose which relic always shows up.\nMultiple relics can be added and will cycle.\nUse `always_clear` to reset the queue.",
-  "version": "v0.0.0",
+  "version": "v0.0.1",
   "has_pck": true,
   "has_dll": true,
   "dependencies": [
