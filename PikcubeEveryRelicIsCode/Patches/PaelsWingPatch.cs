@@ -39,7 +39,7 @@ public static class PaelsWingsStaggerPatch
             return;
         }
 
-        foreach (PaelsWing relic in runState.Players.SelectMany(p => p.Relics).OfType<PaelsWing>())
+        foreach (PaelsWing relic in runState.Players.SelectMany(p => p.Relics).OfType<PaelsWing>().ToArray())
         {
             await relic.OnSacrifice();
         }
