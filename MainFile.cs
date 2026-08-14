@@ -4,6 +4,7 @@ using HarmonyLib;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Models.Relics;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
@@ -23,6 +24,7 @@ public partial class MainFile : Node
     public static void Initialize()
     {
         Harmony harmony = new(ModId);
+
         harmony.PatchAll();
 
         BetterHooks.AfterOneTimeInitialization += BetterHooks_AfterOneTimeInitialization;
@@ -30,12 +32,17 @@ public partial class MainFile : Node
 
     private static void BetterHooks_AfterOneTimeInitialization()
     {
+        AlwaysRelicManager.RelicQueue.Clear();
         AlwaysRelicManager.LoadOrDefault();
     }
 }
 
 public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), ICreatingNewRunListener
 {
+    static AlwaysRelicManager()
+    {
+        new EventSpawnManager().RegisterRule<DollRoom>(_ => !IsRelicQueueEnabled);
+    }
     private static int Position
     {
         get;
@@ -43,7 +50,9 @@ public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), ICreatin
     } = -1;
 
     public static List<RelicModel> RelicQueue { get; set; } = [];
-    public static bool IsRelicQueueEnabled => RelicQueue.Count > 0;
+    public static bool IsRelicQueueEnabled => RelicQueue.Count > 0 && IsQueueFrozen == 0;
+    public static int IsQueueFrozen { get; set; }
+
     public static RelicModel NextRelic(bool moveNext = true)
     {
         if (!IsRelicQueueEnabled)
@@ -113,5 +122,15 @@ public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), ICreatin
         GameMode gameMode, int ascensionLevel, string seed)
     {
         ResetPos();
+    }
+
+    public static void Freeze()
+    {
+        ++IsQueueFrozen;
+    }
+
+    public static void Unfreeze()
+    {
+        --IsQueueFrozen;
     }
 }

@@ -1,3 +1,4 @@
 {
-  
+  "PIKCUBE_EVERY_RELIC_ALWAYS_SETUP.title": "Finish Setup",
+  "PIKCUBE_EVERY_RELIC_ALWAYS_SETUP.description": "Trigger any on pickup effects for your starting relic."
 }
