@@ -5,7 +5,7 @@ using MegaCrit.Sts2.Core.Models;
 
 namespace PikcubeEveryRelicIs.PikcubeEveryRelicIsCode.Commands;
 
-public class AlwaysAdd : AbstractConsoleCmd
+public class AlwaysAdd : AlwaysConsoleCmd
 {
     public override CmdResult Process(Player? issuingPlayer, string[] args)
     {

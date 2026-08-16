@@ -1,13 +1,16 @@
 using BaseLib.Abstracts;
 using Godot;
 using HarmonyLib;
+using MegaCrit.Sts2.Core.Entities.Merchant;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Models.Relics;
+using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.Timeline;
 using Pikcube.Common.Utility;
 using PikcubeEveryRelicIs.PikcubeEveryRelicIsCode.Commands;
 
@@ -41,7 +44,9 @@ public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), ICreatin
 {
     static AlwaysRelicManager()
     {
-        new EventSpawnManager().RegisterRule<DollRoom>(_ => !IsRelicQueueEnabled);
+        EventSpawnManager esm = new();
+        esm.RegisterRule<DollRoom>(_ => !IsRelicQueueEnabled);
+        esm.RegisterRule<FakeMerchant>(_ => !IsRelicQueueEnabled);
     }
     private static int Position
     {
@@ -124,6 +129,35 @@ public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), ICreatin
         ResetPos();
     }
 
+    public override async Task AfterItemPurchased(Player player, MerchantEntry itemPurchased, int goldSpent)
+    {
+        if (!IsRelicQueueEnabled)
+        {
+            return;
+        }
+
+        if (itemPurchased is not MerchantRelicEntry mre)
+        {
+            return;
+        }
+
+        RelicModel next = NextRelic();
+
+        if (player.RunState.CurrentRoom is MerchantRoom mr)
+        {
+            MerchantInventory inventory = mr.Inventories[player.RunState.GetPlayerSlotIndex(player)];
+            foreach (MerchantRelicEntry entry in inventory.RelicEntries.Where(re => re.IsStocked))
+            {
+                AccessTools.DeclaredMethod(typeof(MerchantRelicEntry), "RestockAfterPurchase")
+                    .Invoke(entry, [inventory]);
+            }
+        }
+        
+
+
+
+    }
+
     public static void Freeze()
     {
         ++IsQueueFrozen;
@@ -132,5 +166,10 @@ public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), ICreatin
     public static void Unfreeze()
     {
         --IsQueueFrozen;
+    }
+
+    public static void DecPos()
+    {
+        Position += RelicQueue.Count - 1;
     }
 }

@@ -4,8 +4,8 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Models.Relics;
-using LostWispRelic = MegaCrit.Sts2.Core.Models.Relics.LostWisp;
 using LostWispEvent = MegaCrit.Sts2.Core.Models.Events.LostWisp;
+using LostWispRelic = MegaCrit.Sts2.Core.Models.Relics.LostWisp;
 
 
 namespace PikcubeEveryRelicIs.PikcubeEveryRelicIsCode.Patches;
