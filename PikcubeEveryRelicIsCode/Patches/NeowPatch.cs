@@ -1,4 +1,6 @@
-﻿using HarmonyLib;
+﻿using System.Reflection;
+using HarmonyLib;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Events;
 using MegaCrit.Sts2.Core.Localization;
@@ -22,14 +24,11 @@ public static class NeowPatch
             return __result;
         }
 
-        PrivateFieldWrapper<Player, List<RelicModel>> relicField = __instance.Owner.PrivateFieldWrapper<Player, List<RelicModel>>("_relics");
-        if (relicField.Value is null)
-        {
-            return __result;
-        }
+        AlwaysRelicManager.ResetPos();
+        
 
 
-        if (__instance.Owner.Relics.Any(IsRelicNeedy))
+        if (IsRelicNeedy(AlwaysRelicManager.NextRelic(false)))
         {
             return
             [
@@ -40,7 +39,9 @@ public static class NeowPatch
 
         foreach (RelicModel relic in __instance.Owner.Relics.ToArray())
         {
-            TaskHelper.RunSafely(RelicCmd.Replace(relic, AlwaysRelicManager.NextRelic().ToMutable()));
+            AlwaysRelicManager.ResetPos();
+            RelicCmd.Replace(relic, AlwaysRelicManager.NextRelic().ToMutable()).GetAwaiter().GetResult();
+            AlwaysRelicManager.NextRelic();
         }
         return __result;
 
@@ -54,9 +55,12 @@ public static class NeowPatch
 
     private static async Task MyFunc(Player p, Neow neow, IReadOnlyList<EventOption> readOnlyList)
     {
-        foreach (RelicModel relic in p.Relics)
+
+        foreach (RelicModel relic in p.Relics.ToArray())
         {
-            await relic.AfterObtained();
+            AlwaysRelicManager.ResetPos();
+            await RelicCmd.Replace(relic, AlwaysRelicManager.NextRelic().ToMutable());
+            AlwaysRelicManager.NextRelic();
         }
 
         MethodInfo? method = AccessTools.DeclaredMethod(typeof(EventModel), "SetEventState", [typeof(LocString), typeof(IReadOnlyList<EventOption>)]);
