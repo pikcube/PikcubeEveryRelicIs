@@ -13,7 +13,7 @@ using MegaCrit.Sts2.Core.Saves;
 using Pikcube.Common.Code.Utility;
 using PikcubeEveryRelicIs.PikcubeEveryRelicIsCode.Commands;
 
-namespace PikcubeEveryRelicIs;
+namespace PikcubeEveryRelicIs.PikcubeEveryRelicIsCode;
 
 [ModInitializer(nameof(Initialize))]
 public partial class MainFile : Node
