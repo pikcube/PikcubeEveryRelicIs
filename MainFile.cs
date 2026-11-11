@@ -135,12 +135,12 @@ public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), ICreatin
             return;
         }
 
-        if (itemPurchased is not MerchantRelicEntry mre)
+        if (itemPurchased is not MerchantRelicEntry)
         {
             return;
         }
 
-        RelicModel next = NextRelic();
+        NextRelic();
 
         if (player.RunState.CurrentRoom is MerchantRoom mr)
         {
@@ -151,10 +151,6 @@ public class AlwaysRelicManager() : CustomSingletonModel(HookType.Run), ICreatin
                     .Invoke(entry, [inventory]);
             }
         }
-        
-
-
-
     }
 
     public static void Freeze()

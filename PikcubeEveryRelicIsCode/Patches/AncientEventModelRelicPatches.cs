@@ -7,7 +7,7 @@ namespace PikcubeEveryRelicIs.PikcubeEveryRelicIsCode.Patches;
 [HarmonyPatch(typeof(AncientEventModel), "RelicOption", [typeof(RelicModel), typeof(string), typeof(string)])]
 public class AncientEventModelRelicPatches
 {
-    private static AncientEventModel? _mostRecent = null;
+    private static AncientEventModel? _mostRecent;
     public static void Prefix(AncientEventModel __instance, ref RelicModel relic,
         string pageName = "INITIAL", string? customDonePage = null)
     {
